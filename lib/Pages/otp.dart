@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:clerk_auth/clerk_auth.dart' as auth;
+import 'package:clerk_flutter/clerk_flutter.dart' as clerk;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fuse/Components/DashboardComponent/app_colors.dart';
+import 'package:fuse/Pages/dashboard_screen.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
@@ -12,72 +16,63 @@ class OtpPage extends StatefulWidget {
 
 class _OtpPageState extends State<OtpPage> {
   final _formKey = GlobalKey<FormState>();
+  late final clerk.ClerkAuthState _auth;
+  bool _authInitialized = false;
+  bool isloading = false;
+  bool _isTrue = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!(_authInitialized)) {
+      _auth = clerk.ClerkAuth.of(context); // ✅ initialize _auth here
+      _authInitialized = true;
+    }
+  }
+
+  Future<void> _verifySignUp() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isTrue = true;
+        isloading = true;
+      });
+      String otp = _otpControllers.map((c) => c.text).join();
+      try {
+        await _auth.attemptSignUp(strategy: auth.Strategy.emailCode, code: otp);
+      } catch (e) {
+        setState(() {
+          _isTrue = false;
+          isloading = false;
+        });
+        if (mounted) {
+          setState(() {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(e.toString())));
+          });
+        }
+      } finally {
+        if (_isTrue) {
+          isloading = false;
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => DashboardScreen()),
+            (route) => false,
+          );
+        }
+      }
+    }
+  }
+
   final List<TextEditingController> _otpControllers = List.generate(
     6,
     (_) => TextEditingController(),
   );
 
-  Timer? _timer;
-  int _secondsRemaining = 30;
-  bool _canResend = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-
-  void _startTimer() {
-    setState(() {
-      _secondsRemaining = 30;
-      _canResend = false;
-    });
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsRemaining == 0) {
-        setState(() {
-          _canResend = true;
-          timer.cancel();
-        });
-      } else {
-        setState(() {
-          _secondsRemaining--;
-        });
-      }
-    });
-  }
-
-  void _verifyOtp() {
-    if (_formKey.currentState!.validate()) {
-      String otp = _otpControllers.map((c) => c.text).join();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("OTP Entered: $otp")));
-    }
-  }
-
-  void _resendCode() {
-    if (_canResend) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("OTP Code Resent")));
-      _startTimer();
-    }
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    for (var c in _otpControllers) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.background,
       body: Center(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -89,12 +84,9 @@ class _OtpPageState extends State<OtpPage> {
                 width: 0.92.sw,
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(24.r),
-                  border: Border.all(
-                    width: 1,
-                    color: const Color(0xFF0284C7).withOpacity(0.3),
-                  ),
+                  border: Border.all(width: 1, color: AppColors.divider),
                 ),
                 child: Form(
                   key: _formKey,
@@ -148,7 +140,7 @@ class _OtpPageState extends State<OtpPage> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.r),
                                   borderSide: const BorderSide(
-                                    color: Color(0xFF0284C7),
+                                    color: AppColors.divider,
                                     width: 2,
                                   ),
                                 ),
@@ -172,6 +164,18 @@ class _OtpPageState extends State<OtpPage> {
                       ),
 
                       SizedBox(height: 30.h),
+                      TextButton(
+                        onPressed: () {
+                          for (var controller in _otpControllers) {
+                            controller.clear();
+                          }
+                          setState(() {});
+                        },
+                        child: Text(
+                          "Reset",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
 
                       /// Verify Button
                       SizedBox(
@@ -179,47 +183,25 @@ class _OtpPageState extends State<OtpPage> {
                         height: 48.h,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0284C7),
+                            side: BorderSide(color: AppColors.divider),
+                            backgroundColor: AppColors.cardBackground,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                           ),
-                          onPressed: _verifyOtp,
-                          child: Text(
-                            "Verify",
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          onPressed: _verifySignUp,
+                          child: isloading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  "Verify",
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
-
-                      SizedBox(height: 20.h),
-
-                      /// Resend Section
-                      _canResend
-                          ? GestureDetector(
-                              onTap: _resendCode,
-                              child: Text(
-                                "Resend Code",
-                                style: TextStyle(
-                                  color: const Color(0xFF0284C7),
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            )
-                          : Text(
-                              "Resend in $_secondsRemaining s",
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
                     ],
                   ),
                 ),
@@ -229,5 +211,15 @@ class _OtpPageState extends State<OtpPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    for (var c in _otpControllers) {
+      c.dispose();
+    }
+    _authInitialized = false;
+
+    super.dispose();
   }
 }
