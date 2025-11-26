@@ -35,7 +35,7 @@ class _SignupState extends State<Signup> {
 
   late final clerk.ClerkAuthState _auth;
   late final StreamSubscription _errorSub;
-  auth.User? _user;
+  // auth.User? _user;
   final oauth = ClerkOAuth();
   bool _isTrue = true;
   @override
@@ -43,8 +43,8 @@ class _SignupState extends State<Signup> {
     super.didChangeDependencies();
     if (!(_authInitialized)) {
       _auth = clerk.ClerkAuth.of(context); // ✅ initialize _auth here
-      _user = _auth.user;
-      _auth.addListener(_updateUser);
+      // _user = _auth.user;
+      // _auth.addListener(_updateUser);
       _errorSub = _auth.errorStream.listen((err) {
         setState(() {
           _isTrue = false;
@@ -57,12 +57,12 @@ class _SignupState extends State<Signup> {
     }
   }
 
-  void _updateUser() {
-    if (!mounted) return;
-    setState(() {
-      _user = _auth.user;
-    });
-  }
+  // void _updateUser() {
+  //   if (!mounted) return;
+  //   setState(() {
+  //     _user = _auth.user;
+  //   });
+  // }
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
@@ -185,7 +185,7 @@ class _SignupState extends State<Signup> {
                         onTap: () {
                           signupByGoogle();
                         },
-                        buttname: "Sign up with Google",
+                        buttname: "Continue with Google",
                       ),
                       SizedBox(height: 16.h),
 

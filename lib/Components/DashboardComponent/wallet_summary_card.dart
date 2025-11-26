@@ -73,7 +73,7 @@ class WalletSummaryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
               Text(
-                "My Wallet",
+                "Total Earning Today",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               Icon(
@@ -90,7 +90,7 @@ class WalletSummaryCard extends StatelessWidget {
             children: [
               // 2. الرسم البياني الدائري (Circular Progress Chart)
               CircularPercentIndicator(
-                radius: 50.0,
+                radius: 56.0,
                 lineWidth: 8.0,
                 percent: btcPercent, // 65% للبيتكوين
                 center: Column(
@@ -104,7 +104,7 @@ class WalletSummaryCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "\$${totalBalance.toStringAsFixed(0)}",
+                      "EGP${totalBalance.toStringAsFixed(0)}",
                       style: const TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -124,10 +124,14 @@ class WalletSummaryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    _buildCryptoDetail("Bitcoin", btcPercent, btcColor), // 65%
+                    _buildCryptoDetail(
+                      "Direct Purchases",
+                      btcPercent,
+                      btcColor,
+                    ), // 65%
                     const SizedBox(height: 12),
                     _buildCryptoDetail(
-                      "USDT",
+                      "Affiliates",
                       (1 - btcPercent),
                       usdtColor,
                     ), // 35%
@@ -136,16 +140,16 @@ class WalletSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          // const SizedBox(height: 24),
 
-          // 4. زر السحب (Withdraw Funds)
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {},
-              child: const Text("Withdraw Funds"),
-            ),
-          ),
+          // // 4. زر السحب (Withdraw Funds)
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: ElevatedButton(
+          //     onPressed: () {},
+          //     child: const Text("Withdraw Funds"),
+          //   ),
+          // ),
         ],
       ),
     );

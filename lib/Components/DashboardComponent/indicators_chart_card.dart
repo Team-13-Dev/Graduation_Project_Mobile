@@ -38,6 +38,10 @@ class IndicatorsChartCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
+          // 3. الرسم البياني (Line Chart)
+          SizedBox(height: 180, child: LineChart(_mainData())),
+          const SizedBox(height: 16),
+
           // 2. شريط الرصيد الإجمالي
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -52,17 +56,10 @@ class IndicatorsChartCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
-                      "Total Earns (\$5,940)",
+                      "Net Gross(EGP 80,000)",
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
-                      ),
-                    ),
-                    Text(
-                      "0.00675 BTC",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -93,10 +90,6 @@ class IndicatorsChartCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
-
-          // 3. الرسم البياني (Line Chart)
-          SizedBox(height: 180, child: LineChart(_mainData())),
         ],
       ),
     );

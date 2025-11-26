@@ -174,7 +174,7 @@ class _SigninState extends State<Signin> {
 
                       // Google button
                       CustomGoogleButton(
-                        buttname: "Sign in with google",
+                        buttname: "Continue with Google",
                         onTap: () {
                           signinByGoogle();
                         },

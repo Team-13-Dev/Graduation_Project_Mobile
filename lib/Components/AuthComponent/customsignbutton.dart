@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fuse/Components/DashboardComponent/app_colors.dart';
 
+// ignore: must_be_immutable
 class Customsignbutton extends StatelessWidget {
   void Function()? onTap;
   bool loading;

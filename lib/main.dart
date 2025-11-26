@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:clerk_flutter/clerk_flutter.dart' as clerk;
-import 'package:clerk_auth/clerk_auth.dart' as auth;
 import 'package:fuse/Pages/dashboard_screen.dart';
 import 'package:fuse/Pages/signin.dart';
 import 'package:fuse/Components/DashboardComponent/app_themes.dart';
